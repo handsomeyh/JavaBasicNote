@@ -1,4 +1,4 @@
-package org.example.javadocDemo;
+package org.example.JavadocDemo;
 
 
 /**
