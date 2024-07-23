@@ -1,6 +1,7 @@
 package org.example.JavaDemos;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * @desc: 进行字符串String的深入学习
@@ -116,8 +117,77 @@ public class demo_7_21_01 {
 
         System.out.println("=======================================");
         /**
-         * String
+         * String.intern()方法，理解字符串常量池，几个要点如下：
+         * 第一，使用双引号声明的字符串对象会保存在字符串常量池中。
+         * 第二，使用 new 关键字创建的字符串对象会先从字符串常量池中找，如果没找到就创建一个，然后再在堆中创建字符串对象；如果找到了，就直接在堆中创建字符串对象。
+         * 第三，针对没有使用双引号声明的字符串对象来说，可以调用 intern() 方法来完成
+         * 注意，字符串常量池是堆内存中的一部分，其中类似“123”这种双引号的字符串常量值先回常量池中进行创建存储
+         * 使用new String也会在堆内池外进行“123”的字符对象创建，但是明显二者地址不同
+         * intern属于native方法有着较高的效率，并且可以让确保所有具有相同内容的字符串共享相同的内存空间
          */
+        // 情况1：结果为false
+        String s3 = new String("叮当");
+        // 取得在常量池的“叮当”对象
+        String s4 = s3.intern();
+        // 地址不同
+        System.out.println(s3 == s4);
+
+        // 情况2：结果为true
+        // 当编译器遇见+时：new StringBuilder().append("二哥").append("三妹").toString();
+        String s5 = new String("红红") + new String("火火");
+        // 如果堆内存在“红红火火”的对象，那会intern执行时常量池的对象会直接引用堆中的对象
+        String s6 = s5.intern();
+        System.out.println(s5 == s6);
+
+        System.out.println("=======================================");
+        /**
+         * 如何判断字符串相等，这个问题也可以引申为 .equals() 和 ‘==’ 操作符有什么区别。
+         * “==”操作符用于比较两个对象的地址是否相等。
+         * .equals() 方法用于比较两个对象的内容是否相等。
+         * Object类的equals()方法用==实现的，但是很多类重写了该方法，使其变得没有那么严格
+         *
+         * 其他方法：
+         * 1. Objects.equals() 这个静态方法的优势在于不需要在调用之前判空。
+         * 2. .contentEquals() 的优势在于可以将字符串与任何的字符序列
+         * （StringBuffer、StringBuilder、String、CharSequence）进行比较。
+         */
+        String alita = new String("小哥");
+        String luolita = new String("小哥");
+        // false
+        System.out.println(alita == luolita);
+        // true
+        System.out.println(alita.equals(luolita));
+        // 使用Objects.equals()进行比较,可以查看底层源码，他同时由==与equals实现
+        System.out.println(Objects.equals(alita, luolita));
+        // 优势在于同步使用，StringBuffer用起来很智能，但是单纯对于String来讲就过于复杂
+        System.out.println(alita.contentEquals(luolita));
+
+        System.out.println("=======================================");
+        /**
+         * 如何进行字符串的拼接，如何进行最优雅的String拼接
+         * 拼接字符串最好使用的方法：StringBuilder的append()方法
+         * 其他方法：
+         * String.concat()
+         * String.join()
+         * 实际工作中也用工具类：StringUtils.join
+         */
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("1").append("2");
+        System.out.println(stringBuilder.toString()+"长度为"+stringBuilder.length());
+
+        System.out.println("=======================================");
+        /**
+         * 如何进行字符串的拆分，详解Java的split方法
+         * 但是分隔符种类很多，如何以一概之：使用正则表达式
+         *
+         */
+        String cm = "西站,东站,南站,北站";
+        if (cm.contains(",")){
+            String[] Stas = cm.split(",");
+            System.out.println(Arrays.toString(Stas));
+        } else {
+            throw new IllegalArgumentException("当前字段没有逗号");
+        }
 
     }
 
