@@ -2,6 +2,8 @@ package org.example.JavaDemos;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @desc: 进行字符串String的深入学习
@@ -9,6 +11,12 @@ import java.util.Objects;
  * @date: 2024/7/21
  */
 public class demo_7_21_01 {
+    // 拆分字符串的新选择, 使用static的预编译功能提升效率
+    // 存在.
+    private static Pattern sp1 = Pattern.compile("\\.");
+    // 不仅仅存在. 还要不仅要把字符串按照英文标点的方式拆成两部分，并且英文逗点的前后要有内容。
+    public static Pattern sp2 = Pattern.compile("(.+)\\.(.+)");
+
     public static void main(String[] args) {
         /**
          * 阅读String源码：
@@ -177,21 +185,57 @@ public class demo_7_21_01 {
 
         System.out.println("=======================================");
         /**
-         * 如何进行字符串的拆分，详解Java的split方法
+         * 如何进行字符串的拆分，详解Java的split方法,
          * 但是分隔符种类很多，如何以一概之：使用正则表达式
+         * split()方法的参数属于是正则表达式
+         * 其他方法：
+         * Pattern的quote()方法
          *
          */
+        // 正常的使用情况
         String cm = "西站,东站,南站,北站";
         if (cm.contains(",")){
-            String[] Stas = cm.split(",");
-            System.out.println(Arrays.toString(Stas));
+            String[] Stas1 = cm.split(",");
+            System.out.println(Arrays.toString(Stas1));
         } else {
             throw new IllegalArgumentException("当前字段没有逗号");
         }
 
+        // 特殊符号无法直接使用，结果报错IllegalArgumentException，需要使用正则表达式\\.
+        String sm = "西站.东站.南站.北站";
+        if (sm.contains(".")){
+            String[] Stas2 = sm.split("\\.");
+            System.out.println(Arrays.toString(Stas2));
+        } else {
+            throw new IllegalArgumentException("当前字段没有英文句号");
+        }
+
+        // 使用Pattern.quote()方法,split的源码中return Pattern.compile(regex).split(this, limit);
+        String xm = "西站.东站.南站.北站";
+        if (xm.contains(".")){
+            String[] Stas3 = xm.split(Pattern.quote("."));
+            System.out.println(Arrays.toString(Stas3));
+        } else {
+            throw new IllegalArgumentException("当前字段没有英文句号");
+        }
+
+        // 进行更高效率的拆分,相当于用sp提前设分隔符（使用正则方式进行设置）
+        String[] Sta4 = sp1.split("西站.东站.南站.北站");
+        System.out.println(Arrays.toString(Sta4));
+
+        // 还可以使用 Pattern 配合 Matcher 类进行字符串拆分，这样做的好处是可以对要拆分的字符串进行一些严格的限制
+        checkString("沉默王二.一枚有趣的程序员");
+        checkString("沉默王二.");
+        checkString(".一枚有趣的程序员");
+
     }
 
 
+    /**
+     * 计算字符串的HashCode,自定义方式
+     * @param text
+     * @return 输入字符串的HashCode值
+     */
     public static int computeHashCode(String text){
         int h = 0;
         for (int i = 0; i < text.length(); i++) {
@@ -199,5 +243,18 @@ public class demo_7_21_01 {
             h = h*31 + text.charAt(i);
         }
         return h;
+    }
+
+    /**
+     * 使用Matcher进行更加严格的拆分
+     * @param srt
+     */
+    public static void checkString(String str) {
+        Matcher matcher = sp2.matcher(str);
+        if (matcher.matches()){
+            System.out.println(matcher.group(1)+matcher.group(2));
+        } else {
+            System.out.println("不匹配");
+        }
     }
 }
